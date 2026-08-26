@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Yönetim Paneli · Akademik Takvim</title>
+    <meta name="robots" content="noindex">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&display=swap">
+    <link rel="stylesheet" href="/css/stil.css">
+</head>
+<body>
+
+<!-- ===================== GİRİŞ EKRANI ===================== -->
+<section id="giris-ekrani" class="gizli">
+    <div class="panel giris-kutusu">
+        <h1>Yönetim paneli</h1>
+        <p>Takvimi düzenlemek için oturum açın.</p>
+
+        <form id="giris-formu">
+            <div class="alan">
+                <label for="kullanici-adi">Kullanıcı adı</label>
+                <input class="metin-girisi" id="kullanici-adi" name="kullaniciAdi"
+                       autocomplete="username" required>
+            </div>
+            <div class="alan">
+                <label for="sifre">Şifre</label>
+                <input class="metin-girisi" id="sifre" name="sifre" type="password"
+                       autocomplete="current-password" required>
+            </div>
+            <button class="dugme dugme--birincil" type="submit" style="width:100%;justify-content:center">
+                Giriş yap
+            </button>
+        </form>
+
+        <p class="alan__ipucu" id="giris-hatasi" style="color:var(--bugun);margin-top:12px"></p>
+    </div>
+</section>
+
+<!-- ===================== PANEL ===================== -->
+<div id="panel-ekrani" class="gizli">
+
+    <header class="ust-cubuk">
+        <div class="marka">
+            <span class="marka__kurum">Yönetim Paneli</span>
+            <span class="marka__baslik" id="kullanici-bilgisi"></span>
+        </div>
+        <div class="ust-cubuk__araclar">
+            <a class="dugme" href="/">Takvimi görüntüle</a>
+            <button class="dugme" id="cikis-dugmesi" type="button">Çıkış</button>
+        </div>
+    </header>
+
+    <div style="max-width:1180px;margin:0 auto;padding:24px">
+
+        <div class="sekme-serisi" role="tablist">
+            <button class="sekme" role="tab" data-sekme="etkinlikler" aria-selected="true">Etkinlikler</button>
+            <button class="sekme" role="tab" data-sekme="ice-aktarma" aria-selected="false">PDF içe aktar</button>
+            <button class="sekme" role="tab" data-sekme="tanimlar" aria-selected="false"
+                    id="tanimlar-sekmesi">Sistem tanımları</button>
+        </div>
+
+        <!-- ---------- ETKİNLİKLER ---------- -->
+        <section id="bolum-etkinlikler" class="panel">
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+                <label class="yalnizca-ekran-okuyucu" for="y-yil">Eğitim yılı</label>
+                <select class="secici" id="y-yil"></select>
+
+                <label class="yalnizca-ekran-okuyucu" for="y-birim">Birim</label>
+                <select class="secici" id="y-birim"></select>
+
+                <button class="dugme dugme--birincil" id="yeni-etkinlik" type="button"
+                        style="margin-left:auto">Yeni etkinlik</button>
+            </div>
+
+            <!-- Etkinlik formu: ekleme ve düzenleme aynı formu kullanır -->
+            <form id="etkinlik-formu" class="gizli"
+                  style="border:1px solid var(--cizgi);border-radius:6px;padding:20px;margin-bottom:24px">
+                <input type="hidden" id="f-id">
+
+                <div class="alan">
+                    <label for="f-ad">Etkinlik adı</label>
+                    <input class="metin-girisi" id="f-ad" maxlength="250" required>
+                </div>
+
+                <div class="alan-izgara">
+                    <div class="alan">
+                        <label for="f-baslangic">Başlangıç tarihi</label>
+                        <input class="metin-girisi" id="f-baslangic" type="date" required>
+                    </div>
+                    <div class="alan">
+                        <label for="f-bitis">Bitiş tarihi</label>
+                        <input class="metin-girisi" id="f-bitis" type="date" required>
+                        <span class="alan__ipucu">Tek günlük etkinlikte başlangıçla aynı tarihi seçin.</span>
+                    </div>
+                    <div class="alan">
+                        <label for="f-donem">Dönem</label>
+                        <select class="secici" id="f-donem" style="width:100%">
+                            <option value="GUZ">Güz</option>
+                            <option value="BAHAR">Bahar</option>
+                            <option value="YAZ">Yaz</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="alan-izgara">
+                    <div class="alan">
+                        <label for="f-yil">Eğitim yılı</label>
+                        <select class="secici" id="f-yil" style="width:100%"></select>
+                    </div>
+                    <div class="alan">
+                        <label for="f-kategori">Kategori</label>
+                        <select class="secici" id="f-kategori" style="width:100%"></select>
+                    </div>
+                    <div class="alan">
+                        <label for="f-birim">Birim</label>
+                        <select class="secici" id="f-birim" style="width:100%"></select>
+                    </div>
+                </div>
+
+                <div class="alan">
+                    <label for="f-aciklama">Açıklama <span style="font-weight:400">(isteğe bağlı)</span></label>
+                    <textarea class="metin-alani" id="f-aciklama" maxlength="5000"></textarea>
+                    <span class="alan__ipucu">Açıklamalar PDF çıktısına dahil edilmez.</span>
+                </div>
+
+                <div style="display:flex;gap:8px">
+                    <button class="dugme dugme--birincil" type="submit">Kaydet</button>
+                    <button class="dugme" type="button" id="form-iptal">Vazgeç</button>
+                </div>
+            </form>
+
+            <div class="tablo-sarmali">
+                <table class="tablo">
+                    <thead>
+                        <tr>
+                            <th>Etkinlik</th><th>Başlangıç</th><th>Bitiş</th>
+                            <th>Dönem</th><th>Kategori</th><th>Birim</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="etkinlik-govdesi"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ---------- PDF İÇE AKTARMA ---------- -->
+        <section id="bolum-ice-aktarma" class="panel gizli">
+            <h2 style="font-size:16px;margin-bottom:6px">Akademik takvim PDF'i içe aktar</h2>
+            <p style="color:var(--murekkep-soluk);font-size:13.5px;margin:0 0 20px">
+                Başka bir kurumun yayımladığı takvim PDF'ini yükleyin. Sistem tarihleri
+                ve etkinlik adlarını ayrıştırır; <strong>onaylamadan hiçbir kayıt oluşturulmaz.</strong>
+            </p>
+
+            <!-- 1. AŞAMA: yükleme -->
+            <div id="yukleme-adimi">
+                <div class="birak-alani" id="birak-alani">
+                    <p style="margin:0 0 12px">PDF dosyasını buraya sürükleyin</p>
+                    <input type="file" id="dosya-girisi" accept="application/pdf,.pdf" class="gizli">
+                    <button class="dugme" type="button" id="dosya-sec">Dosya seç</button>
+                </div>
+            </div>
+
+            <!-- 2. AŞAMA: önizleme ve onay -->
+            <div id="onizleme-adimi" class="gizli">
+                <div class="ozet-serisi" id="ozet-serisi"></div>
+
+                <div class="alan-izgara" style="margin-bottom:20px">
+                    <div class="alan">
+                        <label for="i-yil">Hedef eğitim yılı</label>
+                        <select class="secici" id="i-yil" style="width:100%"></select>
+                    </div>
+                    <div class="alan">
+                        <label for="i-birim">Hedef birim</label>
+                        <select class="secici" id="i-birim" style="width:100%"></select>
+                        <span class="alan__ipucu">Tüm satırlar bu birime kaydedilir.</span>
+                    </div>
+                </div>
+
+                <div class="tablo-sarmali">
+                    <table class="tablo">
+                        <thead>
+                            <tr>
+                                <th style="width:34px"></th>
+                                <th>Etkinlik adı</th><th>Başlangıç</th><th>Bitiş</th>
+                                <th>Dönem</th><th>Kategori</th>
+                            </tr>
+                        </thead>
+                        <tbody id="onizleme-govdesi"></tbody>
+                    </table>
+                </div>
+
+                <details id="atlanan-bolumu" style="margin-top:16px">
+                    <summary style="cursor:pointer;font-size:13.5px;color:var(--murekkep-yumusak)">
+                        Ayrıştırılamayan satırlar
+                    </summary>
+                    <ul id="atlanan-listesi"
+                        style="font-size:12.5px;color:var(--murekkep-soluk);margin-top:8px"></ul>
+                </details>
+
+                <div style="display:flex;gap:8px;margin-top:24px">
+                    <button class="dugme dugme--birincil" type="button" id="onayla-dugmesi">
+                        Seçilenleri içe aktar
+                    </button>
+                    <button class="dugme" type="button" id="ice-aktarma-iptal">Vazgeç</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ---------- SİSTEM TANIMLARI ---------- -->
+        <section id="bolum-tanimlar" class="panel gizli">
+            <p style="color:var(--murekkep-soluk);font-size:13.5px;margin:0 0 20px">
+                Yeni fakülte, kategori veya eğitim yılı eklemek için kod değişikliği gerekmez.
+                Kullanılmayan tanımlar silinmek yerine <strong>pasife alınır</strong>; böylece
+                geçmiş takvim kayıtları korunur.
+            </p>
+
+            <div class="sekme-serisi" role="tablist">
+                <button class="sekme" role="tab" data-tanim="birimler" aria-selected="true">Birimler</button>
+                <button class="sekme" role="tab" data-tanim="kategoriler" aria-selected="false">Kategoriler</button>
+                <button class="sekme" role="tab" data-tanim="egitim-yillari" aria-selected="false">Eğitim yılları</button>
+            </div>
+
+            <div id="tanim-icerigi"></div>
+        </section>
+
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/yonetim.js"></script>
+</body>
+</html>

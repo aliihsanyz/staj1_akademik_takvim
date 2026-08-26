@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Akademik Takvim</title>
+    <meta name="description"
+          content="Üniversite akademik takvimi. Fakülte, dönem ve kategoriye göre filtreleyin, PDF veya takvim dosyası olarak indirin.">
+
+    <!-- Başlık yazı tipi. Ulaşılamazsa aşağıdaki sistem yığınına düşülür;
+         sayfa yazı tipi olmadan da tam işlevseldir. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&display=swap">
+
+    <link rel="stylesheet" href="/css/stil.css">
+</head>
+<body>
+
+<header class="ust-cubuk">
+    <div class="marka">
+        <span class="marka__kurum">Üniversite Adı</span>
+        <span class="marka__baslik">Akademik Takvim</span>
+    </div>
+
+    <div class="ust-cubuk__araclar">
+        <label class="yalnizca-ekran-okuyucu" for="yil-secici">Eğitim yılı</label>
+        <select class="secici" id="yil-secici"></select>
+
+        <a class="dugme" id="ics-dugmesi" href="#" download>
+            <span>Takvime ekle</span>
+        </a>
+        <a class="dugme dugme--birincil" id="pdf-dugmesi" href="#" download>
+            <span>PDF indir</span>
+        </a>
+    </div>
+</header>
+
+<div class="duzen">
+
+    <aside class="kenar-cubugu">
+        <h2 class="kenar-cubugu__baslik">Birim</h2>
+        <ul class="birim-listesi" id="birim-listesi"></ul>
+
+        <h2 class="kenar-cubugu__baslik gizli" id="enstitu-basligi">Enstitü ve yüksekokullar</h2>
+        <ul class="birim-listesi" id="enstitu-listesi"></ul>
+    </aside>
+
+    <main>
+        <h1 class="yalnizca-ekran-okuyucu">Akademik takvim etkinlikleri</h1>
+
+        <div class="cip-serisi" id="cip-serisi" role="group" aria-label="Kategori filtresi"></div>
+
+        <div id="icerik">
+            <div class="durum">Yükleniyor…</div>
+        </div>
+    </main>
+
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/takvim.js"></script>
+</body>
+</html>

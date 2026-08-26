@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Spring Boot ana POM'u: tum Spring bagimliliklarinin surumlerini yonetir,
+         boylece surum catismasi riski ortadan kalkar. -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.16</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>tr.edu.akademiktakvim</groupId>
+    <artifactId>akademik-takvim</artifactId>
+    <version>1.0.0</version>
+    <name>Dinamik Akademik Takvim Sistemi</name>
+    <description>Universite akademik takvimlerinin filtrelenebilir, PDF/ICS olarak disa aktarilabilir yonetim sistemi</description>
+
+    <properties>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- Spring disi tek tek sectigimiz kutuphaneler -->
+        <openpdf.version>3.0.5</openpdf.version>
+        <pdfbox.version>3.0.8</pdfbox.version>
+    </properties>
+
+    <dependencies>
+        <!-- ============ Spring Boot cekirdek ============ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- ============ Veritabani surucusu ============ -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- ============ PDF ============ -->
+        <!-- OpenPDF: PDF URETME (disa aktarma). LGPL/MPL, iText 4 catallamasi.
+             DIKKAT: 3.x surumunde paket adi org.openpdf.* (eskiden com.lowagie.*) -->
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>${openpdf.version}</version>
+        </dependency>
+        <!-- Apache PDFBox: PDF OKUMA (ice aktarma / parsing). Apache 2.0 -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>${pdfbox.version}</version>
+        </dependency>
+
+        <!-- ============ Test ============ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!-- Bagimlilik yollarini ${groupId:artifactId:jar} bicimli ozelliklere yazar.
+                 Mockito'nun java agent olarak baglanabilmesi icin gerekir. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>bagimlilik-yollari</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!--
+                      -javaagent: Mockito kendini calisma aninda JVM'e iliştirmeye
+                        calisiyor ve bunun ileriki JDK surumlerinde calismayacagi
+                        uyarisini veriyor. Ajani acikca baglamak bu uyariyi kaldirir
+                        ve gelecekteki JDK yukseltmelerinde testlerin kirilmasini onler.
+                      -Dfile.encoding / user.language: testler her makinede ayni
+                        davransin diye sabitlenir. Sistem locale'i tr_TR oldugundan
+                        ozellikle onemli (Turkce "I" harfi sorunu).
+                    -->
+                    <argLine>
+                        -javaagent:${org.mockito:mockito-core:jar}
+                        -Dfile.encoding=UTF-8
+                        -Duser.language=tr
+                        -Duser.country=TR
+                    </argLine>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

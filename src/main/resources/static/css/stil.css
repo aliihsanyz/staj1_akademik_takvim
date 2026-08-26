@@ -1,0 +1,745 @@
+/* ==========================================================================
+   Dinamik Akademik Takvim - tek stil dosyasi
+   Elle yazilmistir; CSS cercevesi veya derleme adimi yoktur.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. TASARIM BELIRTECLERI
+   Tum renk, olcu ve tipografi kararlari burada tanimlanir; asagida hicbir
+   yerde cip renk degeri yazilmaz. Boylece kurumsal kimlik degistiginde
+   yalnizca bu blok guncellenir.
+   -------------------------------------------------------------------------- */
+:root {
+    /* Renk: koyu deniz mavisi kurumsal ton + kagit beyazi.
+       Kirmizi YALNIZCA "bugun" isaretcisinde kullanilir - sayfada tek bir
+       vurgu noktasi olsun diye. */
+    --murekkep:        #14202b;   /* Ana metin */
+    --murekkep-yumusak:#42505d;   /* Ikincil metin */
+    --murekkep-soluk:  #7d8894;   /* Ucuncul metin, etiketler */
+    --kagit:           #fbfaf8;   /* Sayfa zemini */
+    --yuzey:           #ffffff;   /* Kart ve panel zemini */
+    --lacivert:        #1f4e6b;   /* Birincil kurumsal renk */
+    --lacivert-koyu:   #163a51;
+    --lacivert-sis:    #eef3f6;   /* Secili durum zemini */
+    --bugun:           #b01b2e;   /* SADECE bugun isaretcisi */
+    --cizgi:           #e5e2dc;
+    --cizgi-koyu:      #cfcbc3;
+
+    /* Olcu: 4px tabanli */
+    --bosluk-1: 4px;
+    --bosluk-2: 8px;
+    --bosluk-3: 12px;
+    --bosluk-4: 16px;
+    --bosluk-5: 24px;
+    --bosluk-6: 32px;
+    --bosluk-7: 48px;
+
+    /* Tipografi */
+    --yazi-baslik: "Archivo", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+    --yazi-govde:  ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+    --kenar-yaricap: 6px;
+    --kenar-cubugu-genislik: 236px;
+    --ust-cubuk-yukseklik: 60px;
+
+    --golge-yumusak: 0 1px 2px rgba(20, 32, 43, .06),
+                     0 4px 12px rgba(20, 32, 43, .04);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --murekkep:        #e9edf1;
+        --murekkep-yumusak:#a9b4bf;
+        --murekkep-soluk:  #7b8794;
+        --kagit:           #10171d;
+        --yuzey:           #171f27;
+        --lacivert:        #7db4d4;
+        --lacivert-koyu:   #a5cde5;
+        --lacivert-sis:    #1b2833;
+        --bugun:           #e8637a;
+        --cizgi:           #26313b;
+        --cizgi-koyu:      #37444f;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   2. TEMEL
+   -------------------------------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    background: var(--kagit);
+    color: var(--murekkep);
+    font-family: var(--yazi-govde);
+    font-size: 15px;
+    line-height: 1.55;
+    /* Tarihlerin sutun halinde hizalanmasi icin sabit genislikli rakamlar.
+       Oransal rakamlarla "08-12" ve "28-29" farkli genislikte olur ve
+       tarih sutunu titrer. */
+    font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3 {
+    font-family: var(--yazi-baslik);
+    font-weight: 700;
+    letter-spacing: -.015em;
+    margin: 0;
+}
+
+a { color: var(--lacivert); }
+
+/* Klavyeyle gezinenler icin her zaman gorunur odak halkasi */
+:focus-visible {
+    outline: 2px solid var(--lacivert);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
+.gizli { display: none !important; }
+
+/* Ekran okuyuculara acik, gorsel olarak gizli */
+.yalnizca-ekran-okuyucu {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   3. UST CUBUK
+   -------------------------------------------------------------------------- */
+.ust-cubuk {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    height: var(--ust-cubuk-yukseklik);
+    display: flex;
+    align-items: center;
+    gap: var(--bosluk-4);
+    padding: 0 var(--bosluk-5);
+    background: var(--yuzey);
+    border-bottom: 1px solid var(--cizgi);
+}
+
+.marka { display: flex; flex-direction: column; line-height: 1.15; margin-right: auto; }
+
+.marka__kurum {
+    font-family: var(--yazi-baslik);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+}
+
+.marka__baslik {
+    font-size: 11px;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--murekkep-soluk);
+}
+
+.ust-cubuk__araclar { display: flex; align-items: center; gap: var(--bosluk-2); }
+
+/* --------------------------------------------------------------------------
+   4. FORM OGELERI
+   -------------------------------------------------------------------------- */
+.secici, .metin-alani, .metin-girisi {
+    font: inherit;
+    color: var(--murekkep);
+    background: var(--yuzey);
+    border: 1px solid var(--cizgi-koyu);
+    border-radius: var(--kenar-yaricap);
+    padding: 7px 10px;
+}
+
+.secici { cursor: pointer; padding-right: 28px; }
+
+.metin-alani { resize: vertical; min-height: 76px; width: 100%; }
+.metin-girisi { width: 100%; }
+
+.dugme {
+    font: inherit;
+    font-weight: 600;
+    font-size: 13.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--kenar-yaricap);
+    border: 1px solid var(--cizgi-koyu);
+    background: var(--yuzey);
+    color: var(--murekkep);
+    cursor: pointer;
+    transition: background .12s ease, border-color .12s ease;
+}
+
+.dugme:hover { background: var(--lacivert-sis); border-color: var(--lacivert); }
+
+.dugme--birincil {
+    background: var(--lacivert);
+    border-color: var(--lacivert);
+    color: #fff;
+}
+.dugme--birincil:hover { background: var(--lacivert-koyu); border-color: var(--lacivert-koyu); }
+
+.dugme--tehlike { color: var(--bugun); border-color: var(--bugun); }
+.dugme--tehlike:hover { background: var(--bugun); color: #fff; }
+
+.dugme--kucuk { padding: 5px 10px; font-size: 12.5px; }
+
+.dugme[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* --------------------------------------------------------------------------
+   5. DUZEN
+   -------------------------------------------------------------------------- */
+.duzen {
+    display: grid;
+    grid-template-columns: var(--kenar-cubugu-genislik) minmax(0, 1fr);
+    align-items: start;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 var(--bosluk-5) var(--bosluk-7);
+}
+
+/* --------------------------------------------------------------------------
+   6. KENAR CUBUGU - birim listesi
+   Is analizi Bolum 5.1: kullanici ayni anda YALNIZCA BIR birim secebilir.
+   Bu yuzden radyo dugmesi anlamsalligi kullanilir.
+   -------------------------------------------------------------------------- */
+.kenar-cubugu {
+    position: sticky;
+    top: calc(var(--ust-cubuk-yukseklik) + var(--bosluk-5));
+    padding: var(--bosluk-5) var(--bosluk-4) 0 0;
+}
+
+.kenar-cubugu__baslik {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    color: var(--murekkep-soluk);
+    margin: var(--bosluk-5) 0 var(--bosluk-2);
+}
+.kenar-cubugu__baslik:first-child { margin-top: 0; }
+
+.birim-listesi { list-style: none; margin: 0; padding: 0; }
+
+.birim-listesi button {
+    font: inherit;
+    font-size: 13.5px;
+    width: 100%;
+    text-align: right;
+    padding: 6px 10px 6px 12px;
+    border: 0;
+    border-right: 2px solid transparent;
+    background: none;
+    color: var(--murekkep-yumusak);
+    cursor: pointer;
+    border-radius: 4px 0 0 4px;
+    transition: color .12s ease, border-color .12s ease, background .12s ease;
+}
+
+.birim-listesi button:hover { color: var(--murekkep); background: var(--lacivert-sis); }
+
+.birim-listesi button[aria-current="true"] {
+    color: var(--lacivert);
+    font-weight: 650;
+    border-right-color: var(--lacivert);
+    background: var(--lacivert-sis);
+}
+
+/* --------------------------------------------------------------------------
+   7. KATEGORI CIPLERI - coklu secim (Bolum 5.1)
+   -------------------------------------------------------------------------- */
+.cip-serisi {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--bosluk-2);
+    padding: var(--bosluk-5) 0 var(--bosluk-4);
+    border-bottom: 1px solid var(--cizgi);
+}
+
+.cip {
+    font: inherit;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px 5px 10px;
+    border: 1px solid var(--cizgi-koyu);
+    border-radius: 100px;
+    background: var(--yuzey);
+    color: var(--murekkep-yumusak);
+    cursor: pointer;
+    transition: border-color .12s ease, color .12s ease;
+}
+
+.cip:hover { border-color: var(--murekkep-soluk); color: var(--murekkep); }
+
+.cip[aria-pressed="true"] {
+    border-color: var(--murekkep);
+    color: var(--murekkep);
+    font-weight: 600;
+}
+
+/* Kategori rengi kucuk bir nokta olarak tasinir; genis renk bloklari
+   listenin okunabilirligini bozardi. */
+.cip__nokta {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--nokta-rengi, var(--murekkep-soluk));
+    flex-shrink: 0;
+}
+
+.cip[aria-pressed="false"] .cip__nokta { opacity: .45; }
+
+/* --------------------------------------------------------------------------
+   8. AY GRUPLARI
+   -------------------------------------------------------------------------- */
+.ay-basligi {
+    display: flex;
+    align-items: baseline;
+    gap: var(--bosluk-3);
+    margin: var(--bosluk-6) 0 var(--bosluk-2);
+}
+
+.ay-basligi__ad {
+    font-family: var(--yazi-baslik);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--murekkep);
+    white-space: nowrap;
+}
+
+.ay-basligi__cizgi { flex: 1; height: 1px; background: var(--cizgi); }
+
+.ay-basligi__sayi {
+    font-size: 11.5px;
+    color: var(--murekkep-soluk);
+    white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
+   9. ETKINLIK SATIRI
+   Tarih solda, sabit genislikli sutunda; basili akademik takvimlerin
+   okuma aliskanligini korur ama tablo cizgilerini tasimaz.
+   -------------------------------------------------------------------------- */
+.etkinlik {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: var(--bosluk-4);
+    width: 100%;
+    text-align: right;
+    padding: 11px var(--bosluk-3) 11px 0;
+    border: 0;
+    border-bottom: 1px solid var(--cizgi);
+    border-left: 3px solid transparent;
+    background: none;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: background .12s ease, border-left-color .12s ease;
+}
+
+.etkinlik:hover {
+    background: var(--lacivert-sis);
+    border-left-color: var(--kategori-rengi, var(--lacivert));
+}
+
+.etkinlik__tarih {
+    font-family: var(--yazi-baslik);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--lacivert);
+    text-align: left;
+    padding-left: 10px;
+    white-space: nowrap;
+}
+
+.etkinlik__ad {
+    text-align: right;
+    font-size: 14.5px;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: var(--bosluk-2);
+    justify-content: flex-start;
+}
+
+.etkinlik__nokta {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--kategori-rengi, var(--murekkep-soluk));
+    flex-shrink: 0;
+}
+
+.etkinlik__ust-veri {
+    display: flex;
+    align-items: center;
+    gap: var(--bosluk-3);
+    white-space: nowrap;
+}
+
+.donem-etiketi {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--murekkep-soluk);
+}
+
+.geri-sayim {
+    font-size: 12px;
+    color: var(--murekkep-yumusak);
+    font-variant-numeric: tabular-nums;
+}
+
+/* GECMIS etkinlikler soldurulur: sayfa aciliste dogal olarak "simdi"ye
+   odaklanir. Tamamen gizlenmezler, cunku gecmis tarihler de sorgulanir.
+   Saydamlik .62 secildi: daha dusuk degerlerde metin/zemin karsitligi
+   WCAG AA esigi olan 4.5:1 in altina dusuyordu. */
+.etkinlik--gecmis { opacity: .62; }
+.etkinlik--gecmis:hover { opacity: .85; }
+
+.etkinlik--devam .etkinlik__tarih { color: var(--bugun); }
+.etkinlik--devam .geri-sayim { color: var(--bugun); font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   10. IMZA OGESI - BUGUN CIZGISI
+   Kronolojik akisin icine, gercek konumuna yerlestirilir. Sayfadaki tek
+   kirmizi ogedir. Amaci: kullanicinin "yilin neresindeyim" sorusuna
+   kaydirirken tek bakista cevap vermesi.
+   -------------------------------------------------------------------------- */
+.bugun-cizgisi {
+    display: flex;
+    align-items: center;
+    gap: var(--bosluk-3);
+    margin: var(--bosluk-5) 0;
+    padding-left: 3px;
+}
+
+.bugun-cizgisi__etiket {
+    font-family: var(--yazi-baslik);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--bugun);
+    padding: 3px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+}
+
+.bugun-cizgisi__yol { flex: 1; height: 2px; background: var(--bugun); opacity: .3; }
+
+/* --------------------------------------------------------------------------
+   11. ETKINLIK DETAYI (Bolum 5.3)
+   -------------------------------------------------------------------------- */
+.detay {
+    padding: var(--bosluk-4) var(--bosluk-4) var(--bosluk-5) 15px;
+    border-bottom: 1px solid var(--cizgi);
+    border-left: 3px solid var(--kategori-rengi, var(--lacivert));
+    background: var(--lacivert-sis);
+}
+
+.detay__satir {
+    display: flex;
+    gap: var(--bosluk-2);
+    font-size: 13px;
+    color: var(--murekkep-yumusak);
+    margin-bottom: var(--bosluk-2);
+}
+
+.detay__etiket {
+    color: var(--murekkep-soluk);
+    min-width: 74px;
+}
+
+.detay__aciklama {
+    font-size: 14px;
+    line-height: 1.6;
+    margin: var(--bosluk-3) 0 var(--bosluk-4);
+    color: var(--murekkep);
+}
+
+.detay__eylemler { display: flex; gap: var(--bosluk-2); flex-wrap: wrap; }
+
+/* --------------------------------------------------------------------------
+   12. DURUM EKRANLARI
+   -------------------------------------------------------------------------- */
+.durum {
+    padding: var(--bosluk-7) var(--bosluk-4);
+    text-align: center;
+    color: var(--murekkep-yumusak);
+}
+
+.durum__baslik {
+    font-family: var(--yazi-baslik);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--murekkep);
+    margin-bottom: var(--bosluk-2);
+}
+
+.durum--hata .durum__baslik { color: var(--bugun); }
+
+/* --------------------------------------------------------------------------
+   13. YONETIM PANELI
+   -------------------------------------------------------------------------- */
+.panel {
+    background: var(--yuzey);
+    border: 1px solid var(--cizgi);
+    border-radius: var(--kenar-yaricap);
+    padding: var(--bosluk-5);
+    box-shadow: var(--golge-yumusak);
+}
+
+.giris-kutusu { max-width: 360px; margin: 12vh auto; }
+
+.giris-kutusu h1 { font-size: 20px; margin-bottom: var(--bosluk-1); }
+
+.giris-kutusu p {
+    color: var(--murekkep-soluk);
+    font-size: 13.5px;
+    margin: 0 0 var(--bosluk-5);
+}
+
+.alan { margin-bottom: var(--bosluk-4); }
+
+.alan label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--murekkep-yumusak);
+    margin-bottom: 5px;
+}
+
+.alan__ipucu { font-size: 12px; color: var(--murekkep-soluk); margin-top: 4px; }
+
+.alan-izgara {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: var(--bosluk-4);
+}
+
+.sekme-serisi {
+    display: flex;
+    gap: var(--bosluk-1);
+    border-bottom: 1px solid var(--cizgi);
+    margin-bottom: var(--bosluk-5);
+}
+
+.sekme {
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 9px 14px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: var(--murekkep-soluk);
+    cursor: pointer;
+    margin-bottom: -1px;
+}
+
+.sekme:hover { color: var(--murekkep); }
+
+.sekme[aria-selected="true"] { color: var(--lacivert); border-bottom-color: var(--lacivert); }
+
+/* --------------------------------------------------------------------------
+   14. TABLO
+   -------------------------------------------------------------------------- */
+.tablo { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+
+.tablo th {
+    text-align: right;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--murekkep-soluk);
+    padding: 0 10px 8px;
+    border-bottom: 1px solid var(--cizgi-koyu);
+    white-space: nowrap;
+}
+
+.tablo td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--cizgi);
+    vertical-align: top;
+}
+
+.tablo tbody tr:hover { background: var(--lacivert-sis); }
+
+.tablo__eylemler { display: flex; gap: 6px; justify-content: flex-start; }
+
+.tablo-sarmali { overflow-x: auto; }
+
+.rozet {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .05em;
+    padding: 2px 8px;
+    border-radius: 100px;
+    border: 1px solid currentColor;
+}
+
+.rozet--aktif { color: #0f766e; }
+.rozet--pasif { color: var(--murekkep-soluk); }
+.rozet--uyari { color: #b45309; }
+
+/* --------------------------------------------------------------------------
+   15. BILDIRIM
+   -------------------------------------------------------------------------- */
+.bildirim {
+    position: fixed;
+    right: var(--bosluk-5);
+    bottom: var(--bosluk-5);
+    z-index: 60;
+    max-width: 380px;
+    padding: var(--bosluk-3) var(--bosluk-4);
+    border-radius: var(--kenar-yaricap);
+    border-left: 3px solid var(--lacivert);
+    background: var(--yuzey);
+    box-shadow: 0 8px 28px rgba(20, 32, 43, .16);
+    font-size: 13.5px;
+    animation: bildirim-gir .18s ease-out;
+}
+
+.bildirim--hata { border-left-color: var(--bugun); }
+.bildirim--basari { border-left-color: #0f766e; }
+
+@keyframes bildirim-gir {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* --------------------------------------------------------------------------
+   16. ICE AKTARMA ONIZLEMESI
+   -------------------------------------------------------------------------- */
+.birak-alani {
+    border: 2px dashed var(--cizgi-koyu);
+    border-radius: var(--kenar-yaricap);
+    padding: var(--bosluk-6);
+    text-align: center;
+    color: var(--murekkep-yumusak);
+    transition: border-color .12s ease, background .12s ease;
+}
+
+.birak-alani--uzerinde { border-color: var(--lacivert); background: var(--lacivert-sis); }
+
+.ozet-serisi {
+    display: flex;
+    gap: var(--bosluk-5);
+    flex-wrap: wrap;
+    padding: var(--bosluk-4) 0;
+    border-bottom: 1px solid var(--cizgi);
+    margin-bottom: var(--bosluk-4);
+}
+
+.ozet__sayi {
+    font-family: var(--yazi-baslik);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.ozet__etiket {
+    font-size: 11px;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--murekkep-soluk);
+}
+
+/* Dusuk guvenli satirlar sol kenardan isaretlenir: kullanicinin dikkati
+   once kontrol edilmesi gereken satirlara gitsin. */
+.tablo tr.dusuk-guven td:first-child { box-shadow: inset 3px 0 0 #b45309; }
+
+.uyari-metni { font-size: 11.5px; color: #b45309; display: block; margin-top: 3px; }
+
+.kaynak-satir {
+    font-size: 11px;
+    color: var(--murekkep-soluk);
+    display: block;
+    margin-top: 3px;
+    font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+
+/* --------------------------------------------------------------------------
+   17. DUYARLI DUZEN
+   -------------------------------------------------------------------------- */
+@media (max-width: 860px) {
+    .duzen { grid-template-columns: 1fr; padding: 0 var(--bosluk-4) var(--bosluk-6); }
+
+    .kenar-cubugu {
+        position: static;
+        padding: var(--bosluk-4) 0 0;
+        border-bottom: 1px solid var(--cizgi);
+    }
+
+    /* Dar ekranda birim listesi yatay kaydirilan bir seride toplanir */
+    .birim-listesi {
+        display: flex;
+        gap: var(--bosluk-1);
+        overflow-x: auto;
+        padding-bottom: var(--bosluk-2);
+    }
+
+    .birim-listesi button {
+        width: auto;
+        white-space: nowrap;
+        border-right: 0;
+        border-bottom: 2px solid transparent;
+        border-radius: 4px 4px 0 0;
+    }
+
+    .birim-listesi button[aria-current="true"] {
+        border-right: 0;
+        border-bottom-color: var(--lacivert);
+    }
+
+    .kenar-cubugu__baslik { margin-top: var(--bosluk-4); }
+
+    .etkinlik {
+        grid-template-columns: 78px minmax(0, 1fr);
+        gap: var(--bosluk-3);
+    }
+
+    /* Dar ekranda ust veri tarih sutununun altina gecer */
+    .etkinlik__ust-veri {
+        grid-column: 2;
+        justify-content: flex-start;
+        margin-top: 2px;
+    }
+
+    .ust-cubuk { padding: 0 var(--bosluk-4); }
+    .marka__kurum { font-size: 13.5px; }
+}
+
+@media (max-width: 560px) {
+    .ust-cubuk__araclar .dugme span { display: none; }
+    .ust-cubuk__araclar .dugme { padding: 8px 10px; }
+}
+
+/* Hareket azaltma tercihi olan kullanicilar icin animasyonlar kapatilir */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+    }
+}
+
+@media print {
+    .ust-cubuk, .kenar-cubugu, .cip-serisi, .bildirim { display: none; }
+    .duzen { grid-template-columns: 1fr; }
+    .etkinlik--gecmis { opacity: 1; }
+}

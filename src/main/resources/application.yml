@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: akademik-takvim
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/akademik_takvim
+    username: ${DB_KULLANICI:postgres}
+    password: ${DB_SIFRE:admin123}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    # Semayi Hibernate degil, elle yazdigimiz schema.sql yonetir.
+    # Boylece DDL uzerinde tam kontrol bizde kalir (indeks, CHECK, JSONB...).
+    # validate: Hibernate sema URETMEZ, sadece entity <-> tablo uyumunu DOGRULAR.
+    # Bir alan adi veya tipi kaydigi anda uygulama aciliste hata verir; sessizce calismaz.
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false          # Lazy yukleme hatalarini gizlemesin diye kapali
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Europe/Istanbul
+
+  sql:
+    init:
+      mode: always               # schema.sql her aciliista calisir (IF NOT EXISTS ile idempotent)
+      schema-locations: classpath:db/schema.sql
+      encoding: UTF-8
+
+  servlet:
+    multipart:
+      max-file-size: 15MB        # Ice aktarilan takvim PDF'leri icin
+      max-request-size: 15MB
+
+server:
+  port: 8080
+  servlet:
+    session:
+      cookie:
+        http-only: true          # JavaScript oturum cerezini okuyamaz (XSS savunmasi)
+        same-site: lax           # CSRF savunmasi
+      timeout: 2h
+  error:
+    include-message: always
+
+logging:
+  level:
+    tr.edu.akademiktakvim: DEBUG
+
+# --------------------------------------------------------------------
+# Uygulamaya ozel ayarlar
+# --------------------------------------------------------------------
+uygulama:
+  # Ilk calistirmada olusturulan yonetici sifresi.
+  # Gercek kurulumda ORTAM DEGISKENI ile verilmeli ve ilk giristen sonra degistirilmelidir.
+  varsayilan-admin-sifresi: ${ADMIN_SIFRESI:admin123}
+  # Ornek etkinlikleri yukle (demo / gelistirme icin). Uretimde false yapilmali.
+  ornek-veri-yukle: true
+  universite-adi: "Üniversite Adı"
