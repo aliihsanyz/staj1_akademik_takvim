@@ -1,0 +1,76 @@
+====================================================================
+           AKADEMİK TAKVİM SİSTEMİ - ÇALIŞTIRMA REHBERİ
+====================================================================
+
+Bu proje Java 21, Spring Boot ve PostgreSQL kullanılarak geliştirilmiştir.
+Aşağıdaki adımları takip ederek projeyi kolayca çalıştırabilirsiniz.
+
+--------------------------------------------------------------------
+1. TERMİNALİ HAZIRLAMA VE ORTAMI YÜKLEME
+--------------------------------------------------------------------
+PowerShell terminalinde proje ana dizinindeyken sırasıyla çalıştırın:
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+. .\ortam.ps1
+
+* Not: Bu komutlar Java 21 ve Maven ortam değişkenlerini tanımlar.
+  Ekranda "Ortam hazir:" yazısını görmelisiniz.
+
+
+--------------------------------------------------------------------
+2. PROJEYİ BAŞLATMA
+--------------------------------------------------------------------
+Ortam yüklendikten sonra aynı terminalde şu komutu çalıştırın:
+
+mvn spring-boot:run
+
+* Ekranda "Tomcat started on port 8080 (http)" ve 
+  "Started AkademikTakvimApplication" mesajları çıktığında 
+  uygulama başarıyla başlamıştır.
+
+
+--------------------------------------------------------------------
+3. TARAYICIDAN ERİŞİM
+--------------------------------------------------------------------
+Tarayıcınızda açabileceğiniz adresler:
+
+- Ana Sayfa (Öğrenci / Genel Takvim Görünümü):
+  http://localhost:8080
+
+- Yönetim Paneli (Admin / Birim Yöneticisi Girişi):
+  http://localhost:8080/admin.html
+
+
+--------------------------------------------------------------------
+4. VARSAYILAN GİRİŞ BİLGİLERİ (GİRİŞ HESAPLARI)
+--------------------------------------------------------------------
+Uygulama ilk kez açıldığında otomatik yüklenen test hesapları:
+
+a) Süper Admin (Tüm yetkilere sahip):
+   - Kullanıcı Adı: admin
+   - Şifre        : admin123
+
+b) Birim Yöneticisi (Mühendislik Fakültesi Sekreteri):
+   - Kullanıcı Adı: muh.yonetici
+   - Şifre        : admin123
+
+
+--------------------------------------------------------------------
+5. EK FAYDALI KOMUTLAR
+--------------------------------------------------------------------
+- Uygulamayı Durdurma:
+  Terminalde Ctrl + C tuşlarına basın.
+
+- Testleri Çalıştırma:
+  mvn test
+
+- Tek Başına Çalıştırılabilir JAR Olarak Paketleme:
+  mvn clean package
+  java -jar target/akademik-takvim-1.0.0.jar
+
+- PostgreSQL Servisi Başlatma (Gerekirse):
+  PostgreSQL servisiniz sistemde "postgresql-x64-18" olarak adlandırılmıştır.
+  Eğer servis kapalıysa PowerShell (Yönetici) ile başlatabilirsiniz:
+  Start-Service postgresql-x64-18
+
+====================================================================
