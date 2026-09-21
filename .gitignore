@@ -5,3 +5,7 @@ target/
 *.iml
 .vscode/
 .env
+
+# macOS
+.DS_Store
+**/.DS_Store

@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Yönetim Paneli · Akademik Takvim</title>
+    <title>Yönetim Paneli · Akademik Takvim · Bilecik Şeyh Edebali Üniversitesi</title>
     <meta name="robots" content="noindex">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&display=swap">
+    <link rel="icon" type="image/png" href="/img/favicon.png">
     <link rel="stylesheet" href="/css/stil.css">
 </head>
 <body>
@@ -17,6 +18,9 @@
 <!-- ===================== GİRİŞ EKRANI ===================== -->
 <section id="giris-ekrani" class="gizli">
     <div class="panel giris-kutusu">
+        <img class="giris-kutusu__logo" src="/img/logo.png" width="72" height="72"
+             alt="Bilecik Şeyh Edebali Üniversitesi arması">
+        <p class="giris-kutusu__kurum">Bilecik Şeyh Edebali Üniversitesi</p>
         <h1>Yönetim paneli</h1>
         <p>Takvimi düzenlemek için oturum açın.</p>
 
@@ -36,7 +40,7 @@
             </button>
         </form>
 
-        <p class="alan__ipucu" id="giris-hatasi" style="color:var(--bugun);margin-top:12px"></p>
+        <p class="alan__ipucu" id="giris-hatasi" style="color:var(--hata);margin-top:12px"></p>
     </div>
 </section>
 
@@ -44,10 +48,14 @@
 <div id="panel-ekrani" class="gizli">
 
     <header class="ust-cubuk">
-        <div class="marka">
-            <span class="marka__kurum">Yönetim Paneli</span>
-            <span class="marka__baslik" id="kullanici-bilgisi"></span>
-        </div>
+        <a class="marka" href="/admin.html">
+            <img class="marka__logo" src="/img/logo.png" width="40" height="40"
+                 alt="Bilecik Şeyh Edebali Üniversitesi arması">
+            <span class="marka__yazi">
+                <span class="marka__kurum">Yönetim Paneli</span>
+                <span class="marka__baslik" id="kullanici-bilgisi"></span>
+            </span>
+        </a>
         <div class="ust-cubuk__araclar">
             <a class="dugme" href="/">Takvimi görüntüle</a>
             <button class="dugme" id="cikis-dugmesi" type="button">Çıkış</button>
@@ -175,7 +183,7 @@
                     <div class="alan">
                         <label for="i-birim">Hedef birim</label>
                         <select class="secici" id="i-birim" style="width:100%"></select>
-                        <span class="alan__ipucu">Tüm satırlar bu birime kaydedilir.</span>
+                        <span class="alan__ipucu">Tüm satırlar bu birime kaydedilir. Öğrenci ekranı açılışta genel takvimi gösterir; bir fakülte seçerseniz öğrencilerin soldan o fakülteye tıklaması gerekir.</span>
                     </div>
                 </div>
 

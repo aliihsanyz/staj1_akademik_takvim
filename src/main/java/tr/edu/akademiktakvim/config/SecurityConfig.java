@@ -66,8 +66,10 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(izin -> izin
                     // --- Statik on yuz dosyalari ---
+                    // /img/**: kurum armasi ve site simgesi. Giris ekraninda da
+                    // gorunmesi gerektigi icin kimlik dogrulamasi aranmaz.
                     .requestMatchers("/", "/index.html", "/admin.html",
-                                     "/css/**", "/js/**", "/favicon.ico").permitAll()
+                                     "/css/**", "/js/**", "/img/**", "/favicon.ico").permitAll()
 
                     // --- Herkese acik okuma uclari (Ogrenci / Personel) ---
                     .requestMatchers(HttpMethod.GET, "/api/saglik").permitAll()

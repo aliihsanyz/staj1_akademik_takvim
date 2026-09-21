@@ -42,7 +42,9 @@ class PdfOlusturmaServiceTest {
     void hazirla() {
         PdfFontSaglayici fontSaglayici = new PdfFontSaglayici();
         fontSaglayici.yukle();
-        servis = new PdfOlusturmaService(fontSaglayici, "Örnek Üniversitesi");
+        PdfLogoSaglayici logoSaglayici = new PdfLogoSaglayici();
+        logoSaglayici.yukle();
+        servis = new PdfOlusturmaService(fontSaglayici, logoSaglayici, "Örnek Üniversitesi");
 
         genel = TestVeriUretici.genelBirim(1L);
         muhendislik = TestVeriUretici.aktifBirim(2L, "Mühendislik Fakültesi");

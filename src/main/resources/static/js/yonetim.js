@@ -164,6 +164,15 @@
         return durum.birimler.filter(b => izinli.has(b.id));
     }
 
+    /**
+     * Yeni kayitta ve ice aktarmada onerilen birim: genel takvim.
+     * Genel takvime yetkisi olmayan Birim Yoneticisinde kendi ilk birimine duser.
+     */
+    function varsayilanBirimId() {
+        const yazilabilir = yazilabilirBirimler();
+        return (yazilabilir.find(b => b.tur === 'GENEL') ?? yazilabilir[0])?.id ?? '';
+    }
+
     async function etkinlikleriYukle() {
         const filtre = {
             egitimYiliId: Number($('y-yil').value) || null,
@@ -218,7 +227,7 @@
         $('f-donem').value = etkinlik?.donem ?? 'GUZ';
         $('f-yil').value = etkinlik?.egitimYiliId ?? Api.guncelEgitimYili(durum.yillar)?.id ?? '';
         $('f-kategori').value = etkinlik?.kategoriId ?? durum.kategoriler[0]?.id ?? '';
-        $('f-birim').value = etkinlik?.birimId ?? yazilabilirBirimler()[0]?.id ?? '';
+        $('f-birim').value = etkinlik?.birimId ?? varsayilanBirimId();
         $('f-aciklama').value = etkinlik?.aciklama ?? '';
         $('f-ad').focus();
     }
@@ -313,8 +322,14 @@
             $('yukleme-adimi').classList.add('gizli');
             $('onizleme-adimi').classList.remove('gizli');
 
+            // Varsayilan hedef: icinde bulunulan egitim yili ve genel takvim.
+            // Listenin ilk satirina birakilsaydi, ice aktarilan takvim alfabetik
+            // olarak basta kalan bir fakulteye yazilir ve ogrenci ekraninin
+            // varsayilan gorunumunde (genel takvim) hic gorunmezdi.
             $('i-yil').innerHTML = secenekler(durum.yillar);
+            $('i-yil').value = Api.guncelEgitimYili(durum.yillar)?.id ?? '';
             $('i-birim').innerHTML = secenekler(yazilabilirBirimler());
+            $('i-birim').value = varsayilanBirimId();
 
             onizlemeyiCiz();
         } catch (hata) {

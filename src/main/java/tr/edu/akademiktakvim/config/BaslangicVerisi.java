@@ -86,18 +86,15 @@ public class BaslangicVerisi implements CommandLineRunner {
         if (birimRepository.count() > 0) {
             return;
         }
+        // Sistemde yalnizca UC birim tutulur (is sahibi karari): iki fakulte
+        // ve tum birimleri baglayan genel takvim.
         // GENEL birim ilk sirada: filtreleme mantiginin dayandigi kayittir.
         birimRepository.saveAll(List.of(
-                new Birim("Üniversite Geneli", "GENEL", BirimTuru.GENEL),
-                new Birim("Mühendislik Fakültesi", "MUH_FAK", BirimTuru.FAKULTE),
-                new Birim("Fen-Edebiyat Fakültesi", "FEN_EDB_FAK", BirimTuru.FAKULTE),
-                new Birim("İktisadi ve İdari Bilimler Fakültesi", "IIBF", BirimTuru.FAKULTE),
-                new Birim("Eğitim Fakültesi", "EGT_FAK", BirimTuru.FAKULTE),
-                new Birim("Fen Bilimleri Enstitüsü", "FEN_BIL_ENS", BirimTuru.ENSTITU),
-                new Birim("Sosyal Bilimler Enstitüsü", "SOS_BIL_ENS", BirimTuru.ENSTITU),
-                new Birim("Teknik Bilimler Meslek Yüksekokulu", "TEK_MYO", BirimTuru.MYO)));
+                new Birim("Genel Akademik Takvim", "GENEL", BirimTuru.GENEL),
+                new Birim("Tıp Fakültesi", "TIP_FAK", BirimTuru.FAKULTE),
+                new Birim("Diş Hekimliği Fakültesi", "DIS_HEK_FAK", BirimTuru.FAKULTE)));
 
-        log.info("Başlangıç verisi: 8 birim oluşturuldu.");
+        log.info("Başlangıç verisi: 3 birim oluşturuldu.");
     }
 
     // --------------------------------------------------------------- KATEGORI
@@ -110,10 +107,13 @@ public class BaslangicVerisi implements CommandLineRunner {
         if (kategoriRepository.count() > 0) {
             return;
         }
+        // Kategori renkleri kurumsal bordodan (#96131F) bilerek uzak tutuldu:
+        // bordo sayfanin kimlik rengi, bunlar ise veri ayirt edici. Ayni ailede
+        // olsalardi etkinligin sol kenar cizgisi ust cubukla karisirdi.
         kategoriRepository.saveAll(List.of(
                 new Kategori("Ders ve Sınav Tarihleri", "DERS_SINAV", "#1F4E6B", 1),
                 new Kategori("Kayıt ve Başvuru Tarihleri", "KAYIT_BASVURU", "#0F766E", 2),
-                new Kategori("Resmî Tatiller", "RESMI_TATIL", "#9A3412", 3),
+                new Kategori("Resmî Tatiller", "RESMI_TATIL", "#B45309", 3),
                 new Kategori("Akademik ve İdari Etkinlikler", "AKADEMIK_IDARI", "#4C1D95", 4)));
 
         log.info("Başlangıç verisi: 4 kategori oluşturuldu.");
@@ -140,21 +140,21 @@ public class BaslangicVerisi implements CommandLineRunner {
         }
         Kullanici admin = new Kullanici("admin", sifreleyici.encode(varsayilanAdminSifresi),
                 "Sistem Yöneticisi", Rol.SUPER_ADMIN);
-        admin.setEposta("admin@universite.edu.tr");
+        admin.setEposta("admin@bilecik.edu.tr");
         kullaniciRepository.save(admin);
 
-        // Ornek birim yoneticisi: yalnizca Muhendislik Fakultesine yetkili.
+        // Ornek birim yoneticisi: yalnizca Tip Fakultesine yetkili.
         // Yetki kurallarini elle denemek icin kullanilabilir.
-        birimRepository.findByKod("MUH_FAK").ifPresent(muhFak -> {
-            Kullanici birimYoneticisi = new Kullanici("muh.yonetici",
+        birimRepository.findByKod("TIP_FAK").ifPresent(tipFak -> {
+            Kullanici birimYoneticisi = new Kullanici("tip.yonetici",
                     sifreleyici.encode(varsayilanAdminSifresi),
-                    "Mühendislik Fakültesi Sekreteri", Rol.BIRIM_YONETICISI);
-            birimYoneticisi.setEposta("muh.sekreter@universite.edu.tr");
-            birimYoneticisi.birimEkle(muhFak);
+                    "Tıp Fakültesi Sekreteri", Rol.BIRIM_YONETICISI);
+            birimYoneticisi.setEposta("tip.sekreter@bilecik.edu.tr");
+            birimYoneticisi.birimEkle(tipFak);
             kullaniciRepository.save(birimYoneticisi);
         });
 
-        log.warn("Başlangıç verisi: 'admin' ve 'muh.yonetici' kullanıcıları oluşturuldu. "
+        log.warn("Başlangıç verisi: 'admin' ve 'tip.yonetici' kullanıcıları oluşturuldu. "
                 + "VARSAYILAN ŞİFRE KULLANILIYOR - ilk girişten sonra değiştirin.");
     }
 
@@ -170,9 +170,8 @@ public class BaslangicVerisi implements CommandLineRunner {
         }
 
         Birim genel = birimRepository.findByKod("GENEL").orElseThrow();
-        Birim muhFak = birimRepository.findByKod("MUH_FAK").orElseThrow();
-        Birim fenEdb = birimRepository.findByKod("FEN_EDB_FAK").orElseThrow();
-        Birim fenBilEns = birimRepository.findByKod("FEN_BIL_ENS").orElseThrow();
+        Birim tipFak = birimRepository.findByKod("TIP_FAK").orElseThrow();
+        Birim disFak = birimRepository.findByKod("DIS_HEK_FAK").orElseThrow();
 
         Kategori dersSinav = kategoriRepository.findByKod("DERS_SINAV").orElseThrow();
         Kategori kayit = kategoriRepository.findByKod("KAYIT_BASVURU").orElseThrow();
@@ -192,9 +191,9 @@ public class BaslangicVerisi implements CommandLineRunner {
                         "28 Ekim öğleden sonra başlar."),
                 etkinlik("Güz Yarıyılı Ara Sınavları", LocalDate.of(2025, 11, 10),
                         LocalDate.of(2025, 11, 21), Donem.GUZ, yil, dersSinav, genel, null),
-                etkinlik("Mühendislik Fakültesi Kariyer Günleri", LocalDate.of(2025, 11, 26),
-                        LocalDate.of(2025, 11, 27), Donem.GUZ, yil, akademik, muhFak,
-                        "Sektör temsilcileriyle söyleşi ve staj görüşmeleri."),
+                etkinlik("Tıp Fakültesi Kariyer Günleri", LocalDate.of(2025, 11, 26),
+                        LocalDate.of(2025, 11, 27), Donem.GUZ, yil, akademik, tipFak,
+                        "Hekimlerle söyleşi ve uzmanlık tanıtım görüşmeleri."),
                 etkinlik("Yılbaşı Tatili", LocalDate.of(2026, 1, 1),
                         LocalDate.of(2026, 1, 1), Donem.GUZ, yil, tatil, genel, null),
                 etkinlik("Güz Yarıyılı Final Sınavları", LocalDate.of(2026, 1, 5),
@@ -207,15 +206,15 @@ public class BaslangicVerisi implements CommandLineRunner {
                         LocalDate.of(2026, 2, 6), Donem.BAHAR, yil, kayit, genel, null),
                 etkinlik("Bahar Yarıyılı Derslerin Başlaması", LocalDate.of(2026, 2, 9),
                         LocalDate.of(2026, 2, 9), Donem.BAHAR, yil, dersSinav, genel, null),
-                etkinlik("Lisansüstü Programlara Başvuru", LocalDate.of(2026, 2, 16),
-                        LocalDate.of(2026, 2, 27), Donem.BAHAR, yil, kayit, fenBilEns,
-                        "Yüksek lisans ve doktora programları için online başvurular alınır."),
+                etkinlik("Diş Hekimliği Klinik Uygulama Başvuruları", LocalDate.of(2026, 2, 16),
+                        LocalDate.of(2026, 2, 27), Donem.BAHAR, yil, kayit, disFak,
+                        "Klinik uygulama grupları için online başvurular alınır."),
                 etkinlik("Bahar Yarıyılı Ara Sınavları", LocalDate.of(2026, 4, 6),
                         LocalDate.of(2026, 4, 17), Donem.BAHAR, yil, dersSinav, genel, null),
                 etkinlik("Ulusal Egemenlik ve Çocuk Bayramı", LocalDate.of(2026, 4, 23),
                         LocalDate.of(2026, 4, 23), Donem.BAHAR, yil, tatil, genel, null),
-                etkinlik("Fen-Edebiyat Fakültesi Bilim Şenliği", LocalDate.of(2026, 5, 11),
-                        LocalDate.of(2026, 5, 13), Donem.BAHAR, yil, akademik, fenEdb, null),
+                etkinlik("Tıp Fakültesi Bilim Günleri", LocalDate.of(2026, 5, 11),
+                        LocalDate.of(2026, 5, 13), Donem.BAHAR, yil, akademik, tipFak, null),
                 etkinlik("Emek ve Dayanışma Günü", LocalDate.of(2026, 5, 1),
                         LocalDate.of(2026, 5, 1), Donem.BAHAR, yil, tatil, genel, null),
                 etkinlik("Gençlik ve Spor Bayramı", LocalDate.of(2026, 5, 19),

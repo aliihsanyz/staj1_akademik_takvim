@@ -10,20 +10,37 @@
    yalnizca bu blok guncellenir.
    -------------------------------------------------------------------------- */
 :root {
-    /* Renk: koyu deniz mavisi kurumsal ton + kagit beyazi.
-       Kirmizi YALNIZCA "bugun" isaretcisinde kullanilir - sayfada tek bir
-       vurgu noktasi olsun diye. */
-    --murekkep:        #14202b;   /* Ana metin */
-    --murekkep-yumusak:#42505d;   /* Ikincil metin */
-    --murekkep-soluk:  #7d8894;   /* Ucuncul metin, etiketler */
-    --kagit:           #fbfaf8;   /* Sayfa zemini */
+    /* Renk: BSEU kurumsal bordosu + sicak kagit.
+       Bordo (--bordo) sayfanin kimligini tasir: ust cubuk, birincil dugme,
+       secili birim, sekme. Armadaki kirmizi (#A70E13) ile kurumun kendi
+       tema degiskenleri (#A90005, #852A2F) arasindan secildi.
+
+       KURAL: Bordo kurumun rengidir, "simdi"nin degil. Zamana bagli tek
+       isaret - bugun cizgisi ve devam eden etkinligin geri sayimi - petrol
+       (--vurgu) ile gosterilir. Petrol de kurumun kendi afislerinden gelir
+       (#008B97). Boylece sayfada bordo denizinin icinde tek bir nokta
+       farkli renkte olur ve goz once oraya gider.
+
+       --hata yalnizca yikici islem ve hata mesajlarinda kullanilir; bordodan
+       daha parlak ve turuncuya yakin oldugu icin kurumsal renkle karismaz. */
+    --murekkep:        #241b1c;   /* Ana metin */
+    --murekkep-yumusak:#5a4c4e;   /* Ikincil metin */
+    --murekkep-soluk:  #7e6f71;   /* Ucuncul metin, etiketler */
+    --kagit:           #faf7f5;   /* Sayfa zemini */
     --yuzey:           #ffffff;   /* Kart ve panel zemini */
-    --lacivert:        #1f4e6b;   /* Birincil kurumsal renk */
-    --lacivert-koyu:   #163a51;
-    --lacivert-sis:    #eef3f6;   /* Secili durum zemini */
-    --bugun:           #b01b2e;   /* SADECE bugun isaretcisi */
-    --cizgi:           #e5e2dc;
-    --cizgi-koyu:      #cfcbc3;
+    --bordo:           #96131f;   /* Birincil kurumsal renk */
+    --bordo-koyu:      #6e0d16;
+    --bordo-sis:       #fbeff0;   /* Secili durum zemini */
+    /* Bordo zemin uzerindeki yazi. Acik temada beyaz, koyu temada koyu:
+       koyu temada --bordo acik bir gul tonuna dondugu icin uzerine beyaz
+       yazi okunmaz olurdu. */
+    --birincil-yazi:   #ffffff;
+    --vurgu:           #0e6f7a;   /* SADECE bugun cizgisi ve geri sayim */
+    --vurgu-yazi:      #ffffff;
+    --hata:            #c62828;   /* SADECE yikici islem ve hata */
+    --hata-yazi:       #ffffff;
+    --cizgi:           #e7dfdd;
+    --cizgi-koyu:      #d2c6c4;
 
     /* Olcu: 4px tabanli */
     --bosluk-1: 4px;
@@ -48,17 +65,21 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --murekkep:        #e9edf1;
-        --murekkep-yumusak:#a9b4bf;
-        --murekkep-soluk:  #7b8794;
-        --kagit:           #10171d;
-        --yuzey:           #171f27;
-        --lacivert:        #7db4d4;
-        --lacivert-koyu:   #a5cde5;
-        --lacivert-sis:    #1b2833;
-        --bugun:           #e8637a;
-        --cizgi:           #26313b;
-        --cizgi-koyu:      #37444f;
+        --murekkep:        #f0e9e8;
+        --murekkep-yumusak:#bcacac;
+        --murekkep-soluk:  #8e8081;
+        --kagit:           #17100f;
+        --yuzey:           #201817;
+        --bordo:           #e98892;
+        --bordo-koyu:      #f4a9b0;
+        --bordo-sis:       #2c1c1e;
+        --birincil-yazi:   #2a1113;
+        --vurgu:           #5bc2cd;
+        --vurgu-yazi:      #0b2b2e;
+        --hata:            #f2777a;
+        --hata-yazi:       #2b1111;
+        --cizgi:           #332827;
+        --cizgi-koyu:      #4a3b3a;
     }
 }
 
@@ -89,11 +110,11 @@ h1, h2, h3 {
     margin: 0;
 }
 
-a { color: var(--lacivert); }
+a { color: var(--bordo); }
 
 /* Klavyeyle gezinenler icin her zaman gorunur odak halkasi */
 :focus-visible {
-    outline: 2px solid var(--lacivert);
+    outline: 2px solid var(--bordo);
     outline-offset: 2px;
     border-radius: 3px;
 }
@@ -126,13 +147,36 @@ a { color: var(--lacivert); }
     border-bottom: 1px solid var(--cizgi);
 }
 
-.marka { display: flex; flex-direction: column; line-height: 1.15; margin-right: auto; }
+/* Kurum armasi + ad. Baglanti oldugu icin metin rengi ve alt cizgi sifirlanir;
+   arma daralan ekranda kucultulmez (flex-shrink: 0), kisalan hep metindir. */
+.marka {
+    display: flex;
+    align-items: center;
+    gap: var(--bosluk-3);
+    margin-right: auto;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+}
+
+.marka__logo {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+.marka__yazi { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
 
 .marka__kurum {
     font-family: var(--yazi-baslik);
     font-size: 15px;
     font-weight: 700;
     letter-spacing: -.01em;
+    /* Kurum adi uzun; dar ust cubukta satir kaydirmak yerine kisaltilir. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .marka__baslik {
@@ -177,17 +221,17 @@ a { color: var(--lacivert); }
     transition: background .12s ease, border-color .12s ease;
 }
 
-.dugme:hover { background: var(--lacivert-sis); border-color: var(--lacivert); }
+.dugme:hover { background: var(--bordo-sis); border-color: var(--bordo); }
 
 .dugme--birincil {
-    background: var(--lacivert);
-    border-color: var(--lacivert);
-    color: #fff;
+    background: var(--bordo);
+    border-color: var(--bordo);
+    color: var(--birincil-yazi);
 }
-.dugme--birincil:hover { background: var(--lacivert-koyu); border-color: var(--lacivert-koyu); }
+.dugme--birincil:hover { background: var(--bordo-koyu); border-color: var(--bordo-koyu); }
 
-.dugme--tehlike { color: var(--bugun); border-color: var(--bugun); }
-.dugme--tehlike:hover { background: var(--bugun); color: #fff; }
+.dugme--tehlike { color: var(--hata); border-color: var(--hata); }
+.dugme--tehlike:hover { background: var(--hata); color: var(--hata-yazi); }
 
 .dugme--kucuk { padding: 5px 10px; font-size: 12.5px; }
 
@@ -243,13 +287,13 @@ a { color: var(--lacivert); }
     transition: color .12s ease, border-color .12s ease, background .12s ease;
 }
 
-.birim-listesi button:hover { color: var(--murekkep); background: var(--lacivert-sis); }
+.birim-listesi button:hover { color: var(--murekkep); background: var(--bordo-sis); }
 
 .birim-listesi button[aria-current="true"] {
-    color: var(--lacivert);
+    color: var(--bordo);
     font-weight: 650;
-    border-right-color: var(--lacivert);
-    background: var(--lacivert-sis);
+    border-right-color: var(--bordo);
+    background: var(--bordo-sis);
 }
 
 /* --------------------------------------------------------------------------
@@ -349,15 +393,19 @@ a { color: var(--lacivert); }
 }
 
 .etkinlik:hover {
-    background: var(--lacivert-sis);
-    border-left-color: var(--kategori-rengi, var(--lacivert));
+    background: var(--bordo-sis);
+    border-left-color: var(--kategori-rengi, var(--bordo));
 }
 
 .etkinlik__tarih {
     font-family: var(--yazi-baslik);
     font-size: 13px;
     font-weight: 600;
-    color: var(--lacivert);
+    /* Bilerek murekkep, bordo degil: tarih sutunu sayfada onlarca kez tekrar
+       eder. Bordo olsaydi kurumsal renk bir liste bicimine donusur, ust cubuk
+       ve birincil dugme ile ayni agirliga inerdi. Tarihi one cikaran zaten
+       sabit genislikli sutun ve kalin baslik yazi tipi. */
+    color: var(--murekkep);
     text-align: left;
     padding-left: 10px;
     white-space: nowrap;
@@ -408,8 +456,8 @@ a { color: var(--lacivert); }
 .etkinlik--gecmis { opacity: .62; }
 .etkinlik--gecmis:hover { opacity: .85; }
 
-.etkinlik--devam .etkinlik__tarih { color: var(--bugun); }
-.etkinlik--devam .geri-sayim { color: var(--bugun); font-weight: 600; }
+.etkinlik--devam .etkinlik__tarih { color: var(--vurgu); }
+.etkinlik--devam .geri-sayim { color: var(--vurgu); font-weight: 600; }
 
 /* --------------------------------------------------------------------------
    10. IMZA OGESI - BUGUN CIZGISI
@@ -431,14 +479,14 @@ a { color: var(--lacivert); }
     font-weight: 700;
     letter-spacing: .1em;
     text-transform: uppercase;
-    color: #fff;
-    background: var(--bugun);
+    color: var(--vurgu-yazi);
+    background: var(--vurgu);
     padding: 3px 10px;
     border-radius: 100px;
     white-space: nowrap;
 }
 
-.bugun-cizgisi__yol { flex: 1; height: 2px; background: var(--bugun); opacity: .3; }
+.bugun-cizgisi__yol { flex: 1; height: 2px; background: var(--vurgu); opacity: .3; }
 
 /* --------------------------------------------------------------------------
    11. ETKINLIK DETAYI (Bolum 5.3)
@@ -446,8 +494,8 @@ a { color: var(--lacivert); }
 .detay {
     padding: var(--bosluk-4) var(--bosluk-4) var(--bosluk-5) 15px;
     border-bottom: 1px solid var(--cizgi);
-    border-left: 3px solid var(--kategori-rengi, var(--lacivert));
-    background: var(--lacivert-sis);
+    border-left: 3px solid var(--kategori-rengi, var(--bordo));
+    background: var(--bordo-sis);
 }
 
 .detay__satir {
@@ -489,7 +537,7 @@ a { color: var(--lacivert); }
     margin-bottom: var(--bosluk-2);
 }
 
-.durum--hata .durum__baslik { color: var(--bugun); }
+.durum--hata .durum__baslik { color: var(--hata); }
 
 /* --------------------------------------------------------------------------
    13. YONETIM PANELI
@@ -503,6 +551,26 @@ a { color: var(--lacivert); }
 }
 
 .giris-kutusu { max-width: 360px; margin: 12vh auto; }
+
+.giris-kutusu__logo {
+    display: block;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto var(--bosluk-3);
+    object-fit: contain;
+}
+
+/* Secici bilerek ".giris-kutusu p" den daha ozgul: asagidaki genel paragraf
+   kuralinin soluk rengini ve alt boslugunu !important olmadan ezer. */
+.giris-kutusu p.giris-kutusu__kurum {
+    font-family: var(--yazi-baslik);
+    font-weight: 700;
+    font-size: 13px;
+    text-align: center;
+    letter-spacing: .02em;
+    color: var(--murekkep);
+    margin: 0 0 var(--bosluk-5);
+}
 
 .giris-kutusu h1 { font-size: 20px; margin-bottom: var(--bosluk-1); }
 
@@ -552,7 +620,7 @@ a { color: var(--lacivert); }
 
 .sekme:hover { color: var(--murekkep); }
 
-.sekme[aria-selected="true"] { color: var(--lacivert); border-bottom-color: var(--lacivert); }
+.sekme[aria-selected="true"] { color: var(--bordo); border-bottom-color: var(--bordo); }
 
 /* --------------------------------------------------------------------------
    14. TABLO
@@ -577,7 +645,7 @@ a { color: var(--lacivert); }
     vertical-align: top;
 }
 
-.tablo tbody tr:hover { background: var(--lacivert-sis); }
+.tablo tbody tr:hover { background: var(--bordo-sis); }
 
 .tablo__eylemler { display: flex; gap: 6px; justify-content: flex-start; }
 
@@ -608,14 +676,14 @@ a { color: var(--lacivert); }
     max-width: 380px;
     padding: var(--bosluk-3) var(--bosluk-4);
     border-radius: var(--kenar-yaricap);
-    border-left: 3px solid var(--lacivert);
+    border-left: 3px solid var(--bordo);
     background: var(--yuzey);
     box-shadow: 0 8px 28px rgba(20, 32, 43, .16);
     font-size: 13.5px;
     animation: bildirim-gir .18s ease-out;
 }
 
-.bildirim--hata { border-left-color: var(--bugun); }
+.bildirim--hata { border-left-color: var(--hata); }
 .bildirim--basari { border-left-color: #0f766e; }
 
 @keyframes bildirim-gir {
@@ -635,7 +703,7 @@ a { color: var(--lacivert); }
     transition: border-color .12s ease, background .12s ease;
 }
 
-.birak-alani--uzerinde { border-color: var(--lacivert); background: var(--lacivert-sis); }
+.birak-alani--uzerinde { border-color: var(--bordo); background: var(--bordo-sis); }
 
 .ozet-serisi {
     display: flex;
@@ -704,7 +772,7 @@ a { color: var(--lacivert); }
 
     .birim-listesi button[aria-current="true"] {
         border-right: 0;
-        border-bottom-color: var(--lacivert);
+        border-bottom-color: var(--bordo);
     }
 
     .kenar-cubugu__baslik { margin-top: var(--bosluk-4); }
@@ -722,10 +790,16 @@ a { color: var(--lacivert); }
     }
 
     .ust-cubuk { padding: 0 var(--bosluk-4); }
+    .marka { gap: var(--bosluk-2); }
+    .marka__logo { width: 32px; height: 32px; }
     .marka__kurum { font-size: 13.5px; }
 }
 
 @media (max-width: 560px) {
+    /* Telefonda arma tek basina kurumu tanitmaya yeter; uzun ad yer birakmaz */
+    .marka__kurum { display: none; }
+    .marka__baslik { font-size: 12px; letter-spacing: .04em; }
+
     .ust-cubuk__araclar .dugme span { display: none; }
     .ust-cubuk__araclar .dugme { padding: 8px 10px; }
 }
@@ -739,7 +813,9 @@ a { color: var(--lacivert); }
 }
 
 @media print {
-    .ust-cubuk, .kenar-cubugu, .cip-serisi, .bildirim { display: none; }
+    .ust-cubuk__araclar, .kenar-cubugu, .cip-serisi, .bildirim { display: none; }
+    /* Ust cubuk basiliyor: cikti hangi kuruma ait oldugunu tasimalidir */
+    .ust-cubuk { position: static; border-bottom: 1px solid var(--cizgi); }
     .duzen { grid-template-columns: 1fr; }
     .etkinlik--gecmis { opacity: 1; }
 }

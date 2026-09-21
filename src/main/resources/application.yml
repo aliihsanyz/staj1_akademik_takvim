@@ -3,7 +3,7 @@ spring:
     name: akademik-takvim
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/akademik_takvim
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/akademik_takvim}
     username: ${DB_KULLANICI:postgres}
     password: ${DB_SIFRE:admin123}
     driver-class-name: org.postgresql.Driver
@@ -56,5 +56,5 @@ uygulama:
   # Gercek kurulumda ORTAM DEGISKENI ile verilmeli ve ilk giristen sonra degistirilmelidir.
   varsayilan-admin-sifresi: ${ADMIN_SIFRESI:admin123}
   # Ornek etkinlikleri yukle (demo / gelistirme icin). Uretimde false yapilmali.
-  ornek-veri-yukle: true
-  universite-adi: "Üniversite Adı"
+  ornek-veri-yukle: ${ORNEK_VERI_YUKLE:true}
+  universite-adi: "Bilecik Şeyh Edebali Üniversitesi"

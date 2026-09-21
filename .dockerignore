@@ -1,0 +1,19 @@
+# Derleme ciktilari ve yerel ortam dosyalari goruntuye girmez.
+# Not: target/ disarida birakilmazsa yerel makinedeki eski jar goruntuye
+# sizar ve "benim makinemde calisiyordu" sinifinda hatalara yol acar.
+target/
+.git/
+.gitignore
+.idea/
+.vscode/
+*.iml
+.DS_Store
+**/.DS_Store
+.env
+*.log
+.claude/
+ortam.sh
+ortam.ps1
+CALISTIRMA_REHBERI.txt
+staj defteri/
+*.webp

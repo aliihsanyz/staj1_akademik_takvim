@@ -106,27 +106,56 @@
             // Varsayilan secim: bugunun icinde bulundugu egitim yili
             durum.filtre.egitimYiliId = Api.guncelEgitimYili(yillar)?.id ?? null;
 
-            // Varsayilan birim: "Genel Takvim"
+            // Varsayilan birim: genel takvim (tur = GENEL)
             durum.filtre.birimId = birimler.find(b => b.tur === 'GENEL')?.id ?? null;
 
             yilSeciciyiCiz();
             birimleriCiz();
             cipleriCiz();
-            await etkinlikleriYukle();
+            await etkinlikleriYukle(true);
 
         } catch (hata) {
             hataGoster('Takvim yüklenemedi', hata.message);
         }
     }
 
-    async function etkinlikleriYukle() {
+    async function etkinlikleriYukle(ilkAcilis = false) {
         el.icerik.innerHTML = '<div class="durum">Yükleniyor…</div>';
         try {
             durum.etkinlikler = await Api.etkinlikler(durum.filtre);
+
+            // Varsayilan yil "bugunun icinde bulundugu yil"dir. O yilin takvimi
+            // henuz girilmemisse ekran bombos acilir ve kullanici sistemi bozuk
+            // sanar. Bu yuzden ilk acilista veri BULUNAN yila duseriz.
+            if (ilkAcilis && durum.etkinlikler.length === 0) {
+                await doluYilaDus();
+            }
+
             etkinlikleriCiz();
             indirmeBaglantilariniGuncelle();
         } catch (hata) {
             hataGoster('Etkinlikler yüklenemedi', hata.message);
+        }
+    }
+
+    /**
+     * Secili yil bos cikarsa, ayni birim icin kaydi olan en guncel yila gecer.
+     * Hicbir yilda kayit yoksa secim oldugu gibi birakilir.
+     */
+    async function doluYilaDus() {
+        const adaylar = durum.egitimYillari
+            .filter(y => y.id !== durum.filtre.egitimYiliId)
+            .sort((a, b) => b.baslangicTarihi.localeCompare(a.baslangicTarihi));
+
+        for (const yil of adaylar) {
+            const liste = await Api.etkinlikler({ ...durum.filtre, egitimYiliId: yil.id });
+            if (liste.length) {
+                durum.filtre.egitimYiliId = yil.id;
+                durum.etkinlikler = liste;
+                el.yilSecici.value = yil.id;
+                bildir(`Bu eğitim yılı için kayıt bulunmadığından ${yil.ad} takvimi gösteriliyor.`);
+                return;
+            }
         }
     }
 
@@ -180,8 +209,9 @@
     }
 
     function birimSatiri(b) {
-        const ad = b.tur === 'GENEL' ? 'Genel Takvim' : b.ad;
-        return `<li><button type="button" data-birim-id="${b.id}">${kacisla(ad)}</button></li>`;
+        // Birim adi veritabanindan oldugu gibi gosterilir; GENEL birim de
+        // panelden adlandirilabilsin diye arayuzde ad UYDURULMAZ.
+        return `<li><button type="button" data-birim-id="${b.id}">${kacisla(b.ad)}</button></li>`;
     }
 
     function secimleriTazele() {
@@ -218,11 +248,18 @@
 
     function etkinlikleriCiz() {
         if (!durum.etkinlikler.length) {
+            // Hangi secimin bos oldugu yazilir; aksi halde kullanici "takvim
+            // yuklenmedi" sanir, oysa yalnizca filtre bos donmustur.
+            const yil = durum.egitimYillari.find(y => y.id === durum.filtre.egitimYiliId);
+            const birim = durum.birimler.find(b => b.id === durum.filtre.birimId);
+            const secim = [birim?.ad, yil?.ad].filter(Boolean).join(' · ');
+
             el.icerik.innerHTML =
                 `<div class="durum">
                      <div class="durum__baslik">Etkinlik bulunamadı</div>
-                     <p>Seçtiğiniz filtrelere uygun bir kayıt yok. Kategori seçimlerini
-                        kaldırarak daha geniş bir listeye bakabilirsiniz.</p>
+                     <p>${kacisla(secim)} seçiliyken kayıtlı etkinlik yok. Üstteki eğitim
+                        yılını veya soldaki birimi değiştirerek diğer takvimlere
+                        bakabilirsiniz.</p>
                  </div>`;
             return;
         }

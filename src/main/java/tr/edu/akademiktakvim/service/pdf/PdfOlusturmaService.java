@@ -40,19 +40,27 @@ public class PdfOlusturmaService {
 
     private static final DateTimeFormatter TARIH_BICIMI = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-    // Kurumsal gorunum icin sinirli ve tutarli bir renk paleti
-    private static final Color BASLIK_ARKA = new Color(25, 77, 112);
+    // Kurumsal gorunum icin sinirli ve tutarli bir renk paleti.
+    // Web arayuzuyle ayni bordo (#96131F) ve sicak notr griler kullanilir;
+    // basili cikti ile ekran ayni kimligi tasir.
+    private static final Color BASLIK_ARKA = new Color(150, 19, 31);
     private static final Color BASLIK_YAZI = Color.WHITE;
-    private static final Color SATIR_ALTERNATIF = new Color(244, 247, 250);
-    private static final Color CIZGI = new Color(210, 218, 226);
-    private static final Color IKINCIL_YAZI = new Color(90, 100, 110);
+    private static final Color SATIR_ALTERNATIF = new Color(250, 244, 244);
+    private static final Color CIZGI = new Color(226, 214, 213);
+    private static final Color IKINCIL_YAZI = new Color(106, 92, 93);
+
+    /** Baslikta armanin kaplayacagi kare alanin kenari (punto). */
+    private static final float ARMA_KENARI = 52f;
 
     private final PdfFontSaglayici fontSaglayici;
+    private final PdfLogoSaglayici logoSaglayici;
     private final String universiteAdi;
 
     public PdfOlusturmaService(PdfFontSaglayici fontSaglayici,
+                               PdfLogoSaglayici logoSaglayici,
                                @Value("${uygulama.universite-adi:Üniversite}") String universiteAdi) {
         this.fontSaglayici = fontSaglayici;
+        this.logoSaglayici = logoSaglayici;
         this.universiteAdi = universiteAdi;
     }
 
@@ -93,14 +101,7 @@ public class PdfOlusturmaService {
     // ----------------------------------------------------------------- BASLIK
 
     private void baslikYaz(Document belge, FiltreOzeti ozet) throws DocumentException {
-        Paragraph kurum = new Paragraph(universiteAdi, fontSaglayici.kalin(15f));
-        kurum.setAlignment(Element.ALIGN_CENTER);
-        belge.add(kurum);
-
-        Paragraph baslik = new Paragraph("Akademik Takvim", fontSaglayici.kalin(12f));
-        baslik.setAlignment(Element.ALIGN_CENTER);
-        baslik.setSpacingAfter(4f);
-        belge.add(baslik);
+        belge.add(ustBilgiBlogu());
 
         // Hangi filtrelerle uretildigi belgede yazili olmali: aksi halde ciktiya
         // bakan kisi eksik bir takvime baktigini fark edemez.
@@ -108,6 +109,57 @@ public class PdfOlusturmaService {
         filtreSatiri.setAlignment(Element.ALIGN_CENTER);
         filtreSatiri.setSpacingAfter(14f);
         belge.add(filtreSatiri);
+    }
+
+    /**
+     * Kurum armasi ile kurum adi ve belge basligini iceren ust blogu uretir.
+     *
+     * <p>Cerceve<b>siz</b> uc sutunlu bir tablo kullanilir: solda arma, ortada
+     * metin, sagda armayla ayni genislikte bos bir sutun. Sagdaki bos sutun
+     * olmasaydi metin blogu armanin genisligi kadar saga kayar ve sayfada
+     * ortalanmis gorunmezdi.</p>
+     *
+     * <p>Arma yoksa (dosya eksik) sutun bos kalir; duzen bozulmaz.</p>
+     */
+    private PdfPTable ustBilgiBlogu() {
+        PdfPTable ust = new PdfPTable(new float[]{ARMA_KENARI, 400f, ARMA_KENARI});
+        ust.setWidthPercentage(100);
+        ust.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+
+        ust.addCell(armaHucresi());
+        ust.addCell(kurumMetniHucresi());
+        ust.addCell(bosHucre());
+
+        return ust;
+    }
+
+    private PdfPCell armaHucresi() {
+        PdfPCell hucre = new PdfPCell();
+        hucre.setBorder(Rectangle.NO_BORDER);
+        hucre.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        logoSaglayici.arma(ARMA_KENARI).ifPresent(hucre::addElement);
+        return hucre;
+    }
+
+    private PdfPCell kurumMetniHucresi() {
+        Paragraph kurum = new Paragraph(universiteAdi, fontSaglayici.kalin(15f));
+        kurum.setAlignment(Element.ALIGN_CENTER);
+
+        Paragraph baslik = new Paragraph("Akademik Takvim", fontSaglayici.kalin(12f));
+        baslik.setAlignment(Element.ALIGN_CENTER);
+
+        PdfPCell hucre = new PdfPCell();
+        hucre.setBorder(Rectangle.NO_BORDER);
+        hucre.setVerticalAlignment(Element.ALIGN_MIDDLE);
+        hucre.addElement(kurum);
+        hucre.addElement(baslik);
+        return hucre;
+    }
+
+    private PdfPCell bosHucre() {
+        PdfPCell hucre = new PdfPCell();
+        hucre.setBorder(Rectangle.NO_BORDER);
+        return hucre;
     }
 
     private void bosSonucYaz(Document belge) throws DocumentException {

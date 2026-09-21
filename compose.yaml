@@ -1,0 +1,63 @@
+# =====================================================================
+#  DINAMIK AKADEMIK TAKVIM SISTEMI - DOCKER COMPOSE
+#
+#  Calistirma:  docker compose up -d --build
+#  Durdurma  :  docker compose down          (veri korunur)
+#  Sifirlama :  docker compose down -v       (VERITABANI DA SILINIR)
+#
+#  Adres: http://localhost:8080
+# =====================================================================
+
+services:
+
+  # ------------------------------------------------------------ VERITABANI
+  veritabani:
+    image: postgres:16-alpine
+    container_name: takvim-veritabani
+    environment:
+      POSTGRES_DB: akademik_takvim
+      POSTGRES_USER: ${DB_KULLANICI:-postgres}
+      POSTGRES_PASSWORD: ${DB_SIFRE:-admin123}
+      TZ: Europe/Istanbul
+    volumes:
+      # Adlandirilmis birim: "docker compose down" veriyi SILMEZ.
+      - takvim-verisi:/var/lib/postgresql/data
+    healthcheck:
+      # Uygulama, veritabani gercekten sorgu kabul etmeden baslarsa
+      # "connection refused" ile duser. Bu kontrol onu bekletir.
+      test: ["CMD-SHELL", "pg_isready -U ${DB_KULLANICI:-postgres} -d akademik_takvim"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+    # DIKKAT: 5432 portu BILEREK disariya acilmadi; bu makinede zaten yerel bir
+    # PostgreSQL 5432'de calisiyor ve port catisirdi. Kaptaki veritabanina
+    # disaridan (DBeaver/psql) baglanmak isterseniz asagiyi acin; host tarafinda
+    # 5433 kullanilir:
+    # ports:
+    #   - "5433:5432"
+
+  # -------------------------------------------------------------- UYGULAMA
+  uygulama:
+    build:
+      context: .
+    container_name: takvim-uygulama
+    depends_on:
+      veritabani:
+        condition: service_healthy
+    environment:
+      # Kaplar birbirine SERVIS ADIYLA ulasir; "localhost" kabin kendisidir.
+      DB_URL: jdbc:postgresql://veritabani:5432/akademik_takvim
+      DB_KULLANICI: ${DB_KULLANICI:-postgres}
+      DB_SIFRE: ${DB_SIFRE:-admin123}
+      # Ilk acilista olusturulan yonetici sifresi. Gercek kurulumda .env ile verin.
+      ADMIN_SIFRESI: ${ADMIN_SIFRESI:-admin123}
+      # Demo etkinlikler yuklensin mi? Uretimde "false" yapin.
+      ORNEK_VERI_YUKLE: ${ORNEK_VERI_YUKLE:-true}
+      TZ: Europe/Istanbul
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  takvim-verisi:

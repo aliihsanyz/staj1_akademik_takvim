@@ -50,9 +50,76 @@ a) Süper Admin (Tüm yetkilere sahip):
    - Kullanıcı Adı: admin
    - Şifre        : admin123
 
-b) Birim Yöneticisi (Mühendislik Fakültesi Sekreteri):
-   - Kullanıcı Adı: muh.yonetici
+b) Birim Yöneticisi (Tıp Fakültesi Sekreteri):
+   - Kullanıcı Adı: tip.yonetici
    - Şifre        : admin123
+
+   NOT: Bu değişiklikten ÖNCE oluşturulmuş bir veritabanında bu hesabın adı
+   "muh.yonetici" olarak kalır; yetkisi Tıp Fakültesi'ne taşınmıştır.
+
+c) Sistemdeki birimler (yalnızca üç tanedir):
+   - Genel Akademik Takvim   (tüm birimleri bağlayan takvim)
+   - Tıp Fakültesi
+   - Diş Hekimliği Fakültesi
+
+   Eski veritabanını bu üç birime indirmek için tek seferlik betik:
+   psql -h localhost -U postgres -d akademik_takvim \
+        -f src/main/resources/db/migrasyon/2026-09-16-birimleri-sadelestir.sql
+
+
+--------------------------------------------------------------------
+4.1 DOCKER İLE ÇALIŞTIRMA (Java ve PostgreSQL kurmadan)
+--------------------------------------------------------------------
+Gereken tek şey Docker Desktop'ın kurulu ve AÇIK olmasıdır. Java, Maven ve
+PostgreSQL kurmanıza gerek yoktur; hepsi kapların (container) içindedir.
+
+a) Başlatma (ilk seferde derleme birkaç dakika sürer):
+   docker compose up -d --build
+
+   Ardından: http://localhost:8080  ve  http://localhost:8080/admin.html
+
+b) Durum ve günlükler:
+   docker compose ps
+   docker compose logs -f uygulama
+
+c) Durdurma (veriler KORUNUR):
+   docker compose down
+
+d) Her şeyi silip sıfırdan başlama (VERİTABANI DA SİLİNİR):
+   docker compose down -v
+
+e) Kod değiştirdikten sonra yeniden yayına alma:
+   docker compose up -d --build uygulama
+
+f) Şifreleri değiştirme:
+   cp .env.ornek .env     -> dosyadaki değerleri düzenleyin
+   docker compose up -d
+
+g) Kap içindeki veritabanına bağlanma (psql):
+   docker compose exec veritabani psql -U postgres -d akademik_takvim
+
+   NOT: Veritabanı portu (5432) bilerek dışarı açılmadı; bu makinede zaten
+   yerel bir PostgreSQL 5432'yi kullanıyor ve port çakışırdı. DBeaver gibi bir
+   araçla bağlanmak isterseniz compose.yaml içindeki "ports: 5433:5432"
+   satırlarını açın ve 5433'e bağlanın.
+
+h) Yerel veritabanındaki mevcut kayıtları kaba taşıma:
+   docker compose down -v
+   docker compose up -d veritabani
+   PGPASSWORD=admin123 pg_dump -h localhost -U postgres -d akademik_takvim \
+     | docker compose exec -T veritabani psql -U postgres -d akademik_takvim
+   docker compose up -d uygulama
+
+   (Tablolar dolu geldiği için uygulama örnek veriyi tekrar yüklemez.)
+
+DOSYALAR
+   Dockerfile     : uygulamanın görüntüsü. İki aşamalı: önce Maven ile jar
+                    üretilir, sonra yalnızca JRE + jar içeren küçük bir görüntü
+                    kalır. Uygulama kapta root olarak çalışmaz.
+   compose.yaml   : uygulama + PostgreSQL ikilisini birlikte ayağa kaldırır.
+                    Uygulama, veritabanı "healthy" olmadan başlatılmaz.
+   .dockerignore  : target/, .git gibi klasörlerin görüntüye sızmasını engeller.
+   .env.ornek     : şifre ve ayarların örnek dosyası (.env olarak kopyalayın).
 
 
 --------------------------------------------------------------------
@@ -72,5 +139,72 @@ b) Birim Yöneticisi (Mühendislik Fakültesi Sekreteri):
   PostgreSQL servisiniz sistemde "postgresql-x64-18" olarak adlandırılmıştır.
   Eğer servis kapalıysa PowerShell (Yönetici) ile başlatabilirsiniz:
   Start-Service postgresql-x64-18
+
+====================================================================
+
+====================================================================
+                    macOS (Apple Silicon) İÇİN KURULUM
+====================================================================
+Windows bölümündeki adımların Mac karşılığı aşağıdadır.
+Gereken araçlar Homebrew ile kurulur.
+
+--------------------------------------------------------------------
+M1. GEREKLİ ARAÇLARIN KURULUMU (yalnızca ilk seferde)
+--------------------------------------------------------------------
+Terminalde:
+
+brew install openjdk@21 maven postgresql@17
+
+--------------------------------------------------------------------
+M2. POSTGRESQL SERVİSİNİ BAŞLATMA
+--------------------------------------------------------------------
+brew services start postgresql@17
+
+* Durdurmak icin : brew services stop postgresql@17
+* Durum kontrolu : brew services list
+  (Windows'taki "Start-Service postgresql-x64-18" komutunun karsiligidir.)
+
+--------------------------------------------------------------------
+M3. VERİTABANI VE KULLANICI OLUŞTURMA (yalnızca ilk seferde)
+--------------------------------------------------------------------
+Homebrew kurulumunda "postgres" adli kullanici otomatik olusmaz;
+application.yml bu kullaniciyi bekledigi icin elle olusturulur:
+
+export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"
+psql -h localhost -d postgres -c "CREATE ROLE postgres LOGIN SUPERUSER PASSWORD 'admin123';"
+createdb -h localhost -O postgres akademik_takvim
+
+* Tablolari uygulama acilista schema.sql ile kendisi olusturur.
+
+--------------------------------------------------------------------
+M4. ORTAMI YÜKLEME
+--------------------------------------------------------------------
+Proje ana dizinindeyken:
+
+source ./ortam.sh
+
+* ortam.ps1 dosyasinin Mac karsiligidir; JAVA_HOME ve PATH ayarlar.
+  Ekranda "Ortam hazir:" yazisini gormelisiniz.
+
+--------------------------------------------------------------------
+M5. PROJEYİ BAŞLATMA
+--------------------------------------------------------------------
+mvn spring-boot:run
+
+* Adresler ve giris bilgileri Windows bolumundekiyle aynidir:
+  http://localhost:8080  ve  http://localhost:8080/admin.html
+  admin / admin123   ve   tip.yonetici / admin123
+
+--------------------------------------------------------------------
+M6. SIK KARŞILAŞILAN DURUMLAR
+--------------------------------------------------------------------
+- "Unable to locate a Java Runtime": ortam.sh yuklenmemistir.
+  Once "source ./ortam.sh" calistirin.
+
+- "Connection refused" (5432): PostgreSQL servisi kapalidir.
+  "brew services start postgresql@17" ile baslatin.
+
+- 8080 portu dolu ise onu kullanan sureci bulun:
+  lsof -i :8080
 
 ====================================================================
